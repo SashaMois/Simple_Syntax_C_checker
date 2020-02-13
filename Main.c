@@ -58,8 +58,15 @@ void syntax_checker(char program[])
     int status_for_control_character = OUT_CONTROL_CHARACTER;
 
     /* variables for syntax check */
+    /* round brackets */
     int round_brackets_r = 0;
     int round_brackets_l = 0;
+    /* figure brackets */
+    int figure_brackets_r = 0;
+    int figure_brackets_l = 0;
+    /* square brackets */
+    int square_brackets_r = 0;
+    int square_brackets_l = 0;
 
     for (i = 0; program[i] != '\0'; ++i) {
         /* check entry in control character */
@@ -119,12 +126,48 @@ void syntax_checker(char program[])
                     return;
                 }
             }
+
+            /* check pair figure brackets */
+            if (program[i] == '{')
+                ++figure_brackets_l;
+            else if (program[i] == '}') {
+                ++figure_brackets_r;
+
+                if (figure_brackets_l < figure_brackets_r) {
+                    printf("Quantity of figure right brackets more that quantity of"
+                           " figure left brackets.\n");
+                    return;
+                }
+            }
+
+            /* check pair square brackets */
+            if (program[i] == '[')
+                ++square_brackets_l;
+            else if (program[i] == ']') {
+                ++square_brackets_r;
+                
+                if (square_brackets_l < square_brackets_r) {
+                    printf("Quantity of square right brackets more that quantity of"
+                           " square left brackets.\n");
+                    return;
+                }
+            }
         }
     }
     
     /* finish check */
     if (round_brackets_l > round_brackets_r) {
         printf("Quantity of round left brackets more that quantity of round right brackets.\n");
+        return;
+    }
+
+    if (figure_brackets_l > figure_brackets_r) {
+        printf("Quantity of figure left brackets more that quantity of figure right brackets.\n");
+        return;
+    }
+
+    if (square_brackets_l > square_brackets_r) {
+        printf("Quantity of square left brackets more that quantity of square right brackets.\n");
         return;
     }
 
