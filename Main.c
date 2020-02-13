@@ -47,20 +47,17 @@ void syntax_checker(char program[])
     };
     enum borders_or_starts {
         SYMBOLS_IN_CONTROL_CHARS = 1,
-        START_LINE = 1,
     };
 
     /* variables for discover point in the code */
     int i; /* count */
     int i_control_character = 0;
-    int range_symbols_in_control_chars = SYMBOLS_IN_CONTROL_CHARS;
     int status_for_comments = OUT_COMMENTS;
     int status_for_double_quotes = OUT_DOUBLE_QUOTES;
     int status_for_single_quotes = OUT_SINGLE_QUOTES;
     int status_for_control_character = OUT_CONTROL_CHARACTER;
 
     /* variables for syntax check */
-    int line_number = START_LINE; /* count of code lines */
     int round_brackets_r = 0;
     int round_brackets_l = 0;
 
@@ -72,8 +69,7 @@ void syntax_checker(char program[])
                 && program[i] == '\\')
                 status_for_control_character = IN_CONTROL_CHARACTER;
 
-            else if (i_control_character == range_symbols_in_control_chars) {
-                range_symbols_in_control_chars = SYMBOLS_IN_CONTROL_CHARS;
+            else if (i_control_character == SYMBOLS_IN_CONTROL_CHARS) {
                 i_control_character = 0;
                 status_for_control_character = OUT_CONTROL_CHARACTER;
             }
@@ -118,7 +114,8 @@ void syntax_checker(char program[])
                 ++round_brackets_r;
 
                 if (round_brackets_l < round_brackets_r) {
-                    printf("Quantity of round right brackets more that quantity of round left brackets");
+                    printf("Quantity of round right brackets more that quantity of"
+                           " round left brackets.\n");
                     return;
                 }
             }
@@ -127,7 +124,7 @@ void syntax_checker(char program[])
     
     /* finish check */
     if (round_brackets_l > round_brackets_r) {
-        printf("Quantity of round left brackets more that quantity of round right.\n");
+        printf("Quantity of round left brackets more that quantity of round right brackets.\n");
         return;
     }
 
