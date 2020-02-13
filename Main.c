@@ -57,7 +57,7 @@ void syntax_checker(char program[])
     int status_for_single_quotes = OUT_SINGLE_QUOTES;
     int status_for_control_character = OUT_CONTROL_CHARACTER;
 
-    /* variables for syntax check */
+    /* variables for syntax check (count of anything) */
     /* round brackets */
     int round_brackets_r = 0;
     int round_brackets_l = 0;
@@ -70,6 +70,9 @@ void syntax_checker(char program[])
     /* double quotes */
     int double_quote_open = 0;
     int double_quote_close = 0;
+    /* single quotes */
+    int single_quote_open = 0;
+    int single_quote_close = 0;
 
     for (i = 0; program[i] != '\0'; ++i) {
         /* check entry in control character */
@@ -113,11 +116,15 @@ void syntax_checker(char program[])
         
         /* check entry in single_quotes */
         if (status_for_comments && status_for_double_quotes) {
-            if (status_for_single_quotes == OUT_SINGLE_QUOTES && program[i] == '\'')
+            if (status_for_single_quotes == OUT_SINGLE_QUOTES && program[i] == '\'') {
                 status_for_single_quotes = IN_SINGLE_QUOTES;
+                ++single_quote_open;
+            }
             else if (status_for_single_quotes == IN_SINGLE_QUOTES && program[i] == '\''
-                && status_for_control_character != IN_CONTROL_CHARACTER)
+                && status_for_control_character != IN_CONTROL_CHARACTER) {
                 status_for_single_quotes = OUT_SINGLE_QUOTES;
+                ++single_quote_close;
+            }
         }
 
         /* start check truth of writing all brackets */
@@ -180,8 +187,13 @@ void syntax_checker(char program[])
         return;
     }
 
-    if (double_quote_open > double_quote_close ) {
+    if (double_quote_open > double_quote_close) {
         printf("You forgot to close the double quotes!\n");
+        return;
+    }
+
+    if (single_quote_open > single_quote_close) {
+        printf("You forgot to close the single quotes!\n");
         return;
     }
 
