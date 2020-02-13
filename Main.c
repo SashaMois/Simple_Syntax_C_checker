@@ -10,10 +10,12 @@
  */
 
 #include <stdio.h>
+#include <string.h>
 
 #define MAXLINE 1000000
 
 void syntax_checker (char program[]);
+int check_entry_in_array_of_control_chars(char char_for_check);
 
 int main()
 {
@@ -79,7 +81,7 @@ void syntax_checker(char program[])
 
     for (i = 0; program[i] != '\0'; ++i) {
         /* check entry in control character */
-        if (status_for_double_quotes == IN_DOUBLE_QUOTES 
+        if (status_for_double_quotes == IN_DOUBLE_QUOTES
             || status_for_single_quotes == IN_SINGLE_QUOTES) {
             if (status_for_control_character == OUT_CONTROL_CHARACTER
                 && program[i] == '\\')
@@ -89,9 +91,15 @@ void syntax_checker(char program[])
                 i_control_character = 0;
                 status_for_control_character = OUT_CONTROL_CHARACTER;
             }
-            
-            else if (status_for_control_character == IN_CONTROL_CHARACTER)
-                ++i_control_character;
+
+            else if (status_for_control_character == IN_CONTROL_CHARACTER) {
+                if (check_entry_in_array_of_control_chars(program[i]))
+                    ++i_control_character;
+                else {
+                    printf("No such control character exists!");
+                    return;
+                }
+            }
         }
 
         /* check entry in comments */
@@ -189,7 +197,7 @@ void syntax_checker(char program[])
             }
         }
 
-    }
+        }
     
     /* finish check */
     if (round_brackets_l > round_brackets_r) {
@@ -223,4 +231,19 @@ void syntax_checker(char program[])
         return;
     }
 
+}
+
+int check_entry_in_array_of_control_chars(char char_for_check)
+{
+    enum {
+        NO,
+        YES,
+    };
+
+    char control_characters[] = "abfnrtv\\?\'\"";
+
+    for (int i = 0; i < strlen(control_characters); ++i)
+        if (char_for_check == control_characters[i])
+            return YES;
+    return NO;
 }
