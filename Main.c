@@ -67,6 +67,9 @@ void syntax_checker(char program[])
     /* square brackets */
     int square_brackets_r = 0;
     int square_brackets_l = 0;
+    /* double quotes */
+    int double_quote_open = 0;
+    int double_quote_close = 0;
 
     for (i = 0; program[i] != '\0'; ++i) {
         /* check entry in control character */
@@ -97,11 +100,15 @@ void syntax_checker(char program[])
 
         /* check entry in double_quotes */
         if (status_for_comments && status_for_single_quotes) {
-            if (status_for_double_quotes == OUT_DOUBLE_QUOTES && program[i] == '\"')
+            if (status_for_double_quotes == OUT_DOUBLE_QUOTES && program[i] == '\"') {
                 status_for_double_quotes = IN_DOUBLE_QUOTES;
+                ++double_quote_open;
+            }
             else if (status_for_double_quotes == IN_DOUBLE_QUOTES && program[i] == '\"'
-                && status_for_control_character != IN_CONTROL_CHARACTER)
+                && status_for_control_character != IN_CONTROL_CHARACTER) {
                 status_for_double_quotes = OUT_DOUBLE_QUOTES;
+                ++double_quote_close;
+            }
         }
         
         /* check entry in single_quotes */
@@ -113,6 +120,7 @@ void syntax_checker(char program[])
                 status_for_single_quotes = OUT_SINGLE_QUOTES;
         }
 
+        /* start check truth of writing all brackets */
         if (status_for_comments && status_for_double_quotes && status_for_single_quotes) {
             /* check pair round brackets */
             if (program[i] == '(')
@@ -122,7 +130,7 @@ void syntax_checker(char program[])
 
                 if (round_brackets_l < round_brackets_r) {
                     printf("Quantity of round right brackets more that quantity of"
-                           " round left brackets.\n");
+                           " round left brackets!\n");
                     return;
                 }
             }
@@ -135,7 +143,7 @@ void syntax_checker(char program[])
 
                 if (figure_brackets_l < figure_brackets_r) {
                     printf("Quantity of figure right brackets more that quantity of"
-                           " figure left brackets.\n");
+                           " figure left brackets!\n");
                     return;
                 }
             }
@@ -148,26 +156,32 @@ void syntax_checker(char program[])
                 
                 if (square_brackets_l < square_brackets_r) {
                     printf("Quantity of square right brackets more that quantity of"
-                           " square left brackets.\n");
+                           " square left brackets!\n");
                     return;
                 }
             }
         }
+
     }
     
     /* finish check */
     if (round_brackets_l > round_brackets_r) {
-        printf("Quantity of round left brackets more that quantity of round right brackets.\n");
+        printf("Quantity of round left brackets more that quantity of round right brackets!\n");
         return;
     }
 
     if (figure_brackets_l > figure_brackets_r) {
-        printf("Quantity of figure left brackets more that quantity of figure right brackets.\n");
+        printf("Quantity of figure left brackets more that quantity of figure right brackets!\n");
         return;
     }
 
     if (square_brackets_l > square_brackets_r) {
-        printf("Quantity of square left brackets more that quantity of square right brackets.\n");
+        printf("Quantity of square left brackets more that quantity of square right brackets!\n");
+        return;
+    }
+
+    if (double_quote_open > double_quote_close ) {
+        printf("You forgot to close the double quotes!\n");
         return;
     }
 
