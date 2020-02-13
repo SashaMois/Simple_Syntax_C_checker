@@ -73,6 +73,9 @@ void syntax_checker(char program[])
     /* single quotes */
     int single_quote_open = 0;
     int single_quote_close = 0;
+    /* comments */
+    int comment_open = 0;
+    int comment_close = 0;
 
     for (i = 0; program[i] != '\0'; ++i) {
         /* check entry in control character */
@@ -94,10 +97,10 @@ void syntax_checker(char program[])
         /* check entry in comments */
         if (status_for_double_quotes && status_for_single_quotes) {
             if (status_for_comments == OUT_COMMENTS && program[i] == '/'
-                && program[i + 1] == '*')
+                && program[i + 1] == '*') 
                 status_for_comments = IN_COMMENTS;
             else if (status_for_comments == IN_COMMENTS && program[i] == '*'
-                && program[i + 1] == '/')
+                && program[i + 1] == '/') 
                 status_for_comments = OUT_COMMENTS;
         }
 
@@ -127,9 +130,9 @@ void syntax_checker(char program[])
             }
         }
 
-        /* start check truth of writing all brackets */
+        /* start check truth of writing all brackets*/
         if (status_for_comments && status_for_double_quotes && status_for_single_quotes) {
-            /* check pair round brackets */
+            /* check pair of round brackets */
             if (program[i] == '(')
                 ++round_brackets_l;
             else if (program[i] == ')') {
@@ -142,7 +145,7 @@ void syntax_checker(char program[])
                 }
             }
 
-            /* check pair figure brackets */
+            /* check pair of figure brackets */
             if (program[i] == '{')
                 ++figure_brackets_l;
             else if (program[i] == '}') {
@@ -155,7 +158,7 @@ void syntax_checker(char program[])
                 }
             }
 
-            /* check pair square brackets */
+            /* check pair of square brackets */
             if (program[i] == '[')
                 ++square_brackets_l;
             else if (program[i] == ']') {
@@ -164,6 +167,23 @@ void syntax_checker(char program[])
                 if (square_brackets_l < square_brackets_r) {
                     printf("Quantity of square right brackets more that quantity of"
                            " square left brackets!\n");
+                    return;
+                }
+            }
+        }
+
+        /* start check truth of writing comments */
+        if (status_for_double_quotes && status_for_single_quotes) {
+            if (program[i] == '/' && program[i + 1] == '*'
+                && status_for_comments == IN_COMMENTS)
+                ++comment_open;
+            else if (program[i] == '*' && program[i + 1] == '/'
+                     && status_for_comments == OUT_COMMENTS) {
+                ++comment_close;
+
+                if (comment_open < comment_close) {
+                    printf("Quantity of close symbols comment more that quantity of"
+                           " open symbols comment!\n");
                     return;
                 }
             }
@@ -194,6 +214,12 @@ void syntax_checker(char program[])
 
     if (single_quote_open > single_quote_close) {
         printf("You forgot to close the single quotes!\n");
+        return;
+    }
+    
+    if (comment_open > comment_close) {
+        printf("Quantity of open symbols comment more that quantity of"
+               " close symbols comment!\n");
         return;
     }
 
