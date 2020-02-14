@@ -10,10 +10,12 @@
  */
 
 #include <stdio.h>
+#include <string.h>
 
 #define MAXLINE 1000000
 
 void syntax_checker (char program[]);
+int is_entry_in_control_chars_list(char symbol);
 
 int main()
 {
@@ -87,8 +89,14 @@ void syntax_checker(char program[])
                 status_for_control_character = OUT_CONTROL_CHARACTER;
             }
             
-            else if (status_for_control_character == IN_CONTROL_CHARACTER)
-                ++i_control_character;
+            else if (status_for_control_character == IN_CONTROL_CHARACTER) {
+                if (is_entry_in_control_chars_list(program[i]))
+                    ++i_control_character;
+                else {
+                    printf("No such control character exists!\n");
+                    return;
+                }
+            }
 
             if (status_for_control_character == OUT_CONTROL_CHARACTER
                 && program[i] == '\\')
@@ -224,4 +232,20 @@ void syntax_checker(char program[])
         return;
     }
 
+}
+
+int is_entry_in_control_chars_list(char symbol)
+{
+    char control_characters[] = "abfnrtv\\?'\""; /* list of control characters in C */
+    int i;
+
+    enum {
+        NO,
+        YES,
+    };
+
+    for (i = 0; i < strlen(control_characters); ++i)
+        if (control_characters[i] == symbol)
+            return YES;
+    return NO;
 }
