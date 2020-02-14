@@ -81,17 +81,18 @@ void syntax_checker(char program[])
         /* check entry in control character */
         if (status_for_double_quotes == IN_DOUBLE_QUOTES 
             || status_for_single_quotes == IN_SINGLE_QUOTES) {
-            if (status_for_control_character == OUT_CONTROL_CHARACTER
-                && program[i] == '\\')
-                status_for_control_character = IN_CONTROL_CHARACTER;
 
-            else if (i_control_character == SYMBOLS_IN_CONTROL_CHARS) {
+            if (i_control_character == SYMBOLS_IN_CONTROL_CHARS) {
                 i_control_character = 0;
                 status_for_control_character = OUT_CONTROL_CHARACTER;
             }
             
             else if (status_for_control_character == IN_CONTROL_CHARACTER)
                 ++i_control_character;
+
+            if (status_for_control_character == OUT_CONTROL_CHARACTER
+                && program[i] == '\\')
+                status_for_control_character = IN_CONTROL_CHARACTER;
         }
 
         /* check entry in comments */
