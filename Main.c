@@ -201,42 +201,56 @@ void syntax_checker(char program[])
     }
     
     /* finish check */
+    int i_truth = 0; /* variable for count of true statements */
+
+    enum {
+        MAX_COUNT_OF_TRUTH_STATEMENTS = 6,
+    };
+
     if (round_brackets_l > round_brackets_r) {
         printf("Quantity of round left brackets more that quantity of round right brackets!\n");
         return;
     }
+    ++i_truth;
 
     if (figure_brackets_l > figure_brackets_r) {
         printf("Quantity of figure left brackets more that quantity of figure right brackets!\n");
         return;
     }
+    ++i_truth;
 
     if (square_brackets_l > square_brackets_r) {
         printf("Quantity of square left brackets more that quantity of square right brackets!\n");
         return;
     }
+    ++i_truth;
 
     if (double_quote_open > double_quote_close) {
         printf("You forgot to close the double quotes!\n");
         return;
     }
+    ++i_truth;
 
     if (single_quote_open > single_quote_close) {
         printf("You forgot to close the single quotes!\n");
         return;
     }
+    ++i_truth;
     
     if (comment_open > comment_close) {
         printf("Quantity of open symbols comment more that quantity of"
                " close symbols comment!\n");
         return;
     }
+    ++i_truth;
+
+    printf("All right! Let's start the program!\n");
 
 }
 
 int is_entry_in_control_chars_list(char symbol)
 {
-    char control_characters[] = "abfnrtv\\?'\""; /* list of control characters in C */
+    char control_characters[] = "abfnrtv\\?'\"0"; /* list of control characters in C */
     int i;
 
     enum {
