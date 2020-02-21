@@ -15,6 +15,8 @@
 void syntax_checker (char program[]);
 int is_entry_in_control_chars_list(char symbol);
 
+int line_number_with_er = 0;
+
 int main()
 {
     int c; /* variable for save future input */
@@ -29,6 +31,20 @@ int main()
         program[i] = c;
 
     syntax_checker(program);
+
+    if (line_number_with_er) {
+        int i2 = 1;
+
+        putchar('\a');
+        printf("\n\n\n%18d\t", i2++);
+        for (i = 0; program[i] != '\0'; ++i)
+            if (program[i] == '\n' && i2 == line_number_with_er)
+                printf("\n   ERROR %9d\t", i2++);
+            else if (program[i] == '\n' && program[i+1] != '\0')
+                printf("\n%18d\t", i2++);
+            else
+                putchar(program[i]);
+    }
 
     return 0;
 }
@@ -105,7 +121,8 @@ void syntax_checker(char program[])
                 if (is_entry_in_control_chars_list(program[i]))
                     ++i_control_character;
                 else {
-                    printf("No such control character exists in %d line!\n", line_number);
+                    printf("\nNo such control character exists in %d line!\n", line_number);
+                    line_number_with_er = line_number;
                     return;
                 }
             }
@@ -175,7 +192,8 @@ void syntax_checker(char program[])
                     ++counter_chars_in_single_q;
 
                 if (counter_chars_in_single_q == max_chars_in_single_q && program[i + 1] != '\'') {
-                    printf("Single quotation marks exceed allowed in %d line!\n", line_number);
+                    printf("\nSingle quotation marks exceed allowed in %d line!\n", line_number);
+                    line_number_with_er = line_number;
                     return;
                 }
                 else if (counter_chars_in_single_q == max_chars_in_single_q) {
@@ -198,8 +216,9 @@ void syntax_checker(char program[])
                 ++round_brackets_r;
 
                 if (round_brackets_l < round_brackets_r) {
-                    printf("Quantity of round right brackets more that quantity of"
+                    printf("\nQuantity of round right brackets more that quantity of"
                            " round left brackets in %d line!\n", line_number);
+                    line_number_with_er = line_number;
                     return;
                 }
 
@@ -217,8 +236,9 @@ void syntax_checker(char program[])
                 ++figure_brackets_r;
 
                 if (figure_brackets_l < figure_brackets_r) {
-                    printf("Quantity of figure right brackets more that quantity of"
+                    printf("\nQuantity of figure right brackets more that quantity of"
                            " figure left brackets in %d line!\n", line_number);
+                    line_number_with_er = line_number;
                     return;
                 }
 
@@ -236,8 +256,9 @@ void syntax_checker(char program[])
                 ++square_brackets_r;
                 
                 if (square_brackets_l < square_brackets_r) {
-                    printf("Quantity of square right brackets more that quantity of"
+                    printf("\nQuantity of square right brackets more that quantity of"
                            " square left brackets in %d line!\n", line_number);
+                    line_number_with_er = line_number;
                     return;
                 }
 
@@ -259,8 +280,9 @@ void syntax_checker(char program[])
                 ++comment_close;
 
                 if (comment_open < comment_close) {
-                    printf("Quantity of close symbols comment more that quantity of"
+                    printf("\nQuantity of close symbols comment more that quantity of"
                            " open symbols comment in %d line!\n", line_number);
+                    line_number_with_er = line_number;
                     return;
                 }
 
@@ -282,46 +304,52 @@ void syntax_checker(char program[])
     };
 
     if (round_brackets_l > round_brackets_r) {
-        printf("Quantity of round left brackets more that quantity of"
+        printf("\nQuantity of round left brackets more that quantity of"
                " round right brackets in %d line!\n", round_bracket_memor);
+        line_number_with_er = round_bracket_memor;
         return;
     }
     ++i_truth;
 
     if (figure_brackets_l > figure_brackets_r) {
-        printf("Quantity of figure left brackets more that quantity of"
+        printf("\nQuantity of figure left brackets more that quantity of"
                " figure right brackets in %d line!\n", figure_bracket_memor);
+        line_number_with_er = figure_bracket_memor;
         return;
     }
     ++i_truth;
 
     if (square_brackets_l > square_brackets_r) {
-        printf("Quantity of square left brackets more that quantity of"
+        printf("\nQuantity of square left brackets more that quantity of"
                " square right brackets in %d line!\n", square_bracket_memor);
+        line_number_with_er = square_bracket_memor;
         return;
     }
     ++i_truth;
 
     if (double_quote_open > double_quote_close) {
-        printf("You forgot to close the double quotes in %d line!\n", double_quote_memor);
+        printf("\nYou forgot to close the double quotes in %d line!\n", double_quote_memor);
+        line_number_with_er = double_quote_memor;
         return;
     }
     ++i_truth;
 
     if (single_quote_open > single_quote_close) {
-        printf("You forgot to close the single quotes in %d line!\n", single_quote_memor);
+        printf("\nYou forgot to close the single quotes in %d line!\n", single_quote_memor);
+        line_number_with_er = single_quote_memor;
         return;
     }
     ++i_truth;
     
     if (comment_open > comment_close) {
-        printf("Quantity of open symbols comment more that quantity of"
+        printf("\nQuantity of open symbols comment more that quantity of"
                " close symbols comment in %d line!\n", comment_memor);
+        line_number_with_er = comment_memor;
         return;
     }
     ++i_truth;
 
-    printf("All right! Let's start this program!\n");
+    printf("\nAll right! Let's start this program!\n");
 
 }
 
