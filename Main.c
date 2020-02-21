@@ -44,6 +44,7 @@ int main()
                 printf("\n%18d\t", i2++);
             else
                 putchar(program[i]);
+        putchar('\n');
     }
 
     return 0;
@@ -330,13 +331,6 @@ void syntax_checker(char program[])
     if (double_quote_open > double_quote_close) {
         printf("\nYou forgot to close the double quotes in %d line!\n", double_quote_memor);
         line_number_with_er = double_quote_memor;
-        return;
-    }
-    ++i_truth;
-
-    if (single_quote_open > single_quote_close) {
-        printf("\nYou forgot to close the single quotes in %d line!\n", single_quote_memor);
-        line_number_with_er = single_quote_memor;
         return;
     }
     ++i_truth;
