@@ -122,12 +122,16 @@ void syntax_checker(char program[])
         /* check entry in comments */
         if (status_for_double_quotes && status_for_single_quotes) {
             if (status_for_comments == OUT_COMMENTS && program[i] == '/'
-                && program[i + 1] == '*') 
+                && program[i + 1] == '*') {
                 status_for_comments = IN_COMMENTS;
+                i += 2;
+            }
 
             else if (status_for_comments == IN_COMMENTS && program[i] == '*'
-                && program[i + 1] == '/')
+                && program[i + 1] == '/') {
                 status_for_comments = OUT_COMMENTS;
+                i += 2;
+            }
         }
 
         /* check entry in double_quotes */
@@ -317,7 +321,7 @@ void syntax_checker(char program[])
     }
     ++i_truth;
 
-    printf("All right! Let's start the program!\n");
+    printf("All right! Let's start this program!\n");
 
 }
 
