@@ -8,8 +8,6 @@
  * square brackets, double and single quotes, comments
  * and truth of writing in control characters
  *
- *  Created to: 12 February
- *     Author: SashaMois
  */
 
 #define MAXLINE 1000000
@@ -83,6 +81,16 @@ void syntax_checker(char program[])
     int counter_chars_in_single_q = 0;
     int max_chars_in_single_q = SYMBOLS_IN_SINGLE_Q;
 
+    int line_number = 1; /* number of current line in program */
+
+    /* memos for lines with any opening language design */
+    int round_bracket_memor = 0; /* memorization for line with open round bracket */
+    int figure_bracket_memor = 0; /* memorization for line with open figure bracket */
+    int square_bracket_memor = 0; /* memorization for line with open square bracket */
+    int double_quote_memor = 0;  /* memorization for line with open double quote */ 
+    int single_quote_memor = 0; /* memorization for line with open single quote */ 
+    int comment_memor = 0; /* memorization for line with open comment */ 
+
     for (i = 0; program[i] != '\0'; ++i) {
         /* check entry in control character */
         if (status_for_double_quotes == IN_DOUBLE_QUOTES 
@@ -97,7 +105,7 @@ void syntax_checker(char program[])
                 if (is_entry_in_control_chars_list(program[i]))
                     ++i_control_character;
                 else {
-                    printf("No such control character exists!\n");
+                    printf("No such control character exists in %d line!\n", line_number);
                     return;
                 }
             }
@@ -116,8 +124,9 @@ void syntax_checker(char program[])
             if (status_for_comments == OUT_COMMENTS && program[i] == '/'
                 && program[i + 1] == '*') 
                 status_for_comments = IN_COMMENTS;
+
             else if (status_for_comments == IN_COMMENTS && program[i] == '*'
-                && program[i + 1] == '/') 
+                && program[i + 1] == '/')
                 status_for_comments = OUT_COMMENTS;
         }
 
@@ -126,12 +135,18 @@ void syntax_checker(char program[])
             if (status_for_double_quotes == OUT_DOUBLE_QUOTES && program[i] == '\"') {
                 status_for_double_quotes = IN_DOUBLE_QUOTES;
                 ++double_quote_open;
+
+                if (!double_quote_memor)
+                    double_quote_memor = line_number;
             }
             else if (status_for_double_quotes == IN_DOUBLE_QUOTES && program[i] == '\"'
                 && status_for_control_character != IN_CONTROL_CHARACTER) {
                 status_for_double_quotes = OUT_DOUBLE_QUOTES;
                 ++double_quote_close;
-            }
+
+                if (double_quote_open == double_quote_close)
+                    double_quote_memor = 0;
+            }   
         }
         
         /* check entry in single_quotes */
@@ -139,18 +154,24 @@ void syntax_checker(char program[])
             if (status_for_single_quotes == OUT_SINGLE_QUOTES && program[i] == '\'') {
                 status_for_single_quotes = IN_SINGLE_QUOTES;
                 ++single_quote_open;
+
+                if (!single_quote_memor)
+                    single_quote_memor = line_number;
             }
             else if (status_for_single_quotes == IN_SINGLE_QUOTES && program[i] == '\''
                 && status_for_control_character != IN_CONTROL_CHARACTER) {
                 status_for_single_quotes = OUT_SINGLE_QUOTES;
                 ++single_quote_close;
+
+                if (single_quote_open == single_quote_close)
+                    single_quote_memor = 0;
             }
             else if (status_for_single_quotes == IN_SINGLE_QUOTES) {
                 if (program[i] != '\\')
                     ++counter_chars_in_single_q;
 
                 if (counter_chars_in_single_q == max_chars_in_single_q && program[i + 1] != '\'') {
-                    printf("Single quotation marks exceed allowed!\n");
+                    printf("Single quotation marks exceed allowed in %d line!\n", line_number);
                     return;
                 }
                 else if (counter_chars_in_single_q == max_chars_in_single_q) {
@@ -164,61 +185,88 @@ void syntax_checker(char program[])
         /* start check truth of writing all brackets*/
         if (status_for_comments && status_for_double_quotes && status_for_single_quotes) {
             /* check pair of round brackets */
-            if (program[i] == '(')
+            if (program[i] == '(') {
                 ++round_brackets_l;
+                if (!round_bracket_memor)
+                    round_bracket_memor = line_number;
+            }
             else if (program[i] == ')') {
                 ++round_brackets_r;
 
                 if (round_brackets_l < round_brackets_r) {
                     printf("Quantity of round right brackets more that quantity of"
-                           " round left brackets!\n");
+                           " round left brackets in %d line!\n", line_number);
                     return;
                 }
+
+                if (round_brackets_l == round_brackets_r)
+                    round_bracket_memor = 0;
             }
 
             /* check pair of figure brackets */
-            if (program[i] == '{')
+            if (program[i] == '{') {
                 ++figure_brackets_l;
+                if (!figure_bracket_memor)
+                    figure_bracket_memor = line_number;
+            }
             else if (program[i] == '}') {
                 ++figure_brackets_r;
 
                 if (figure_brackets_l < figure_brackets_r) {
                     printf("Quantity of figure right brackets more that quantity of"
-                           " figure left brackets!\n");
+                           " figure left brackets in %d line!\n", line_number);
                     return;
                 }
+
+                if (figure_brackets_l == figure_brackets_r)
+                    figure_bracket_memor = 0;
             }
 
             /* check pair of square brackets */
-            if (program[i] == '[')
+            if (program[i] == '[') {
                 ++square_brackets_l;
+                if (!square_bracket_memor)
+                    square_bracket_memor = line_number;
+            }
             else if (program[i] == ']') {
                 ++square_brackets_r;
                 
                 if (square_brackets_l < square_brackets_r) {
                     printf("Quantity of square right brackets more that quantity of"
-                           " square left brackets!\n");
+                           " square left brackets in %d line!\n", line_number);
                     return;
                 }
+
+                if (square_brackets_l == square_brackets_r)
+                    square_bracket_memor = 0;
             }
         }
 
         /* start check truth of writing comments */
         if (status_for_double_quotes && status_for_single_quotes) {
             if (program[i] == '/' && program[i + 1] == '*'
-                && status_for_comments == IN_COMMENTS)
+                && status_for_comments == IN_COMMENTS) {
                 ++comment_open;
+                if (!comment_memor)
+                    comment_memor = line_number;
+            }
             else if (program[i] == '*' && program[i + 1] == '/'
                      && status_for_comments == OUT_COMMENTS) {
                 ++comment_close;
 
                 if (comment_open < comment_close) {
                     printf("Quantity of close symbols comment more that quantity of"
-                           " open symbols comment!\n");
+                           " open symbols comment in %d line!\n", line_number);
                     return;
                 }
+
+                if (comment_open == comment_close)
+                    comment_memor = 0;
             }
         }
+
+        if (program[i] == '\n')
+            ++line_number;
 
     }
     
@@ -230,38 +278,41 @@ void syntax_checker(char program[])
     };
 
     if (round_brackets_l > round_brackets_r) {
-        printf("Quantity of round left brackets more that quantity of round right brackets!\n");
+        printf("Quantity of round left brackets more that quantity of"
+               " round right brackets in %d line!\n", round_bracket_memor);
         return;
     }
     ++i_truth;
 
     if (figure_brackets_l > figure_brackets_r) {
-        printf("Quantity of figure left brackets more that quantity of figure right brackets!\n");
+        printf("Quantity of figure left brackets more that quantity of"
+               " figure right brackets in %d line!\n", figure_bracket_memor);
         return;
     }
     ++i_truth;
 
     if (square_brackets_l > square_brackets_r) {
-        printf("Quantity of square left brackets more that quantity of square right brackets!\n");
+        printf("Quantity of square left brackets more that quantity of"
+               " square right brackets in %d line!\n", square_bracket_memor);
         return;
     }
     ++i_truth;
 
     if (double_quote_open > double_quote_close) {
-        printf("You forgot to close the double quotes!\n");
+        printf("You forgot to close the double quotes in %d line!\n", double_quote_memor);
         return;
     }
     ++i_truth;
 
     if (single_quote_open > single_quote_close) {
-        printf("You forgot to close the single quotes!\n");
+        printf("You forgot to close the single quotes in %d line!\n", single_quote_memor);
         return;
     }
     ++i_truth;
     
     if (comment_open > comment_close) {
         printf("Quantity of open symbols comment more that quantity of"
-               " close symbols comment!\n");
+               " close symbols comment in %d line!\n", comment_memor);
         return;
     }
     ++i_truth;
