@@ -1,3 +1,6 @@
+#include <stdio.h>
+#include <string.h>
+
 /*
  * Main.c
  *
@@ -8,9 +11,6 @@
  *  Created to: 12 February
  *     Author: SashaMois
  */
-
-#include <stdio.h>
-#include <string.h>
 
 #define MAXLINE 1000000
 
@@ -49,6 +49,7 @@ void syntax_checker(char program[])
     };
     enum borders_or_starts {
         SYMBOLS_IN_CONTROL_CHARS = 1,
+        SYMBOLS_IN_SINGLE_Q = 1,
     };
 
     /* variables for discover point in the code */
@@ -78,6 +79,9 @@ void syntax_checker(char program[])
     /* comments */
     int comment_open = 0;
     int comment_close = 0;
+    /* count of characters in single quotes */
+    int counter_chars_in_single_q = 0;
+    int max_chars_in_single_q = SYMBOLS_IN_SINGLE_Q;
 
     for (i = 0; program[i] != '\0'; ++i) {
         /* check entry in control character */
@@ -99,8 +103,12 @@ void syntax_checker(char program[])
             }
 
             if (status_for_control_character == OUT_CONTROL_CHARACTER
-                && program[i] == '\\')
+                && program[i] == '\\') {
                 status_for_control_character = IN_CONTROL_CHARACTER;
+
+                ++max_chars_in_single_q;
+                ++counter_chars_in_single_q;
+            }
         }
 
         /* check entry in comments */
@@ -137,6 +145,20 @@ void syntax_checker(char program[])
                 status_for_single_quotes = OUT_SINGLE_QUOTES;
                 ++single_quote_close;
             }
+            else if (status_for_single_quotes == IN_SINGLE_QUOTES) {
+                if (program[i] != '\\')
+                    ++counter_chars_in_single_q;
+
+                if (counter_chars_in_single_q == max_chars_in_single_q && program[i + 1] != '\'') {
+                    printf("Single quotation marks exceed allowed!\n");
+                    return;
+                }
+                else if (counter_chars_in_single_q == max_chars_in_single_q) {
+                    max_chars_in_single_q = SYMBOLS_IN_SINGLE_Q;
+                    counter_chars_in_single_q = 0; 
+                }
+            }
+            
         }
 
         /* start check truth of writing all brackets*/
